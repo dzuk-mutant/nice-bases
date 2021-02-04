@@ -24,7 +24,7 @@ Classic hexadecimal.
     > Base.fromInt b16 44000
     "abe0" : String
 
-This is case insensitive, meaning that if you use `Base.fromString`
+This is case insensitive, meaning that if you use `Base.toInt`
 it'll interpret upper and lower case as interchangeable.
 
     > Base.toInt b16 "fe0f"
@@ -47,7 +47,7 @@ dense and easy to manually type in.
     > Base.fromInt b32 44000
     "xy8" : String
 
-This is case insensitive, meaning that if you use `Base.fromString`
+This is case insensitive, meaning that if you use `Base.toInt`
 it'll interpret upper and lower case as the same.
 
     > Base.toInt b32 "jeff"

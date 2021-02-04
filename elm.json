@@ -1,9 +1,9 @@
 {
     "type": "package",
     "name": "dzuk/nice-bases",
-    "summary": "Convert to, from and between many non-decimal numbers.",
+    "summary": "Convert to, from and between many types of non-decimal numbers.",
     "license": "BSD-3-Clause",
-    "version": "1.0.2",
+    "version": "1.0.0",
     "exposed-modules": [
         "Base"
     ],

@@ -1,16 +1,19 @@
-module Base exposing (b16, b32, b58, b62, b64, fromInt, toInt, StringInputErr(..), convert)
+module Base exposing (b16, b32, b32rfc, b36, b58, b62, b64, b64url, make, CaseSensitivity(..), fromInt, toInt, convert, StringInputErr(..))
 
-{-| Convert to and from positive numbers of different bases.
+{-| Convert to, from and between positive numbers of different bases.
 
 # Bases
-@docs b16, b32, b58, b62, b64
+@docs b16, b32, b32rfc, b36, b58, b62, b64, b64url
 
 # Conversions
 @docs fromInt, toInt, convert
 
 # Errors
-
 @docs StringInputErr
+
+# Create your own
+@docs make, CaseSensitivity
+
 -}
 
 
@@ -25,7 +28,7 @@ Classic hexadecimal.
     "abe0" : String
 
 This is case insensitive, meaning that if you use `Base.toInt`
-it'll interpret upper and lower case as interchangeable.
+it'll interpret upper and lower case input as the same.
 
     > Base.toInt b16 "fe0f"
     Ok 65039
@@ -34,33 +37,67 @@ it'll interpret upper and lower case as interchangeable.
     Ok 65039
 -}
 b16 : Base
-b16 = Base 
-    { chars = "0123456789abcdef"
-    , cases = CaseAgnostic
-    }
+b16 = make 
+    "0123456789abcdef"
+    CaseAgnostic
+
 
 {-| **base32.**
+
+This is a slightly reduced subset of all numbers and letters,
+leaving out `w`, `x`, `y`, and `z`.
+
+    > Base.fromInt b32 44000
+    "1av0"
+
+This is case insensitive, meaning that if you use `Base.toInt`
+it'll interpret upper and lower case input as the same.
+-}
+b32 : Base
+b32 = make
+    "0123456789abcdefghijklmnopqrstuv"
+    CaseAgnostic
+
+
+{-| **base32 in the RFC 4648 standard.**
+
+This is a slightly reduced subset of all numbers and letters, leaving out
+visually confusing combinations. The characters are ordered
+differently from normal b32.
+
+    > Base.fromInt b32rfc 44000
+    "bk7a" 
+This is case insensitive, meaning that if you use `Base.toInt`
+it'll interpret upper and lower case input as the same.
+-}
+b32rfc : Base
+b32rfc = make
+    "abcdefghijklmnopqrstuvwxyz234567"
+    CaseAgnostic
+
+
+{-| **base36.**
 
 This is all numbers and letters in any case, making it both relatively
 dense and easy to manually type in.
 
-    > Base.fromInt b32 44000
-    "xy8" : String
+    > Base.fromInt b36 44000
+    "xy8"
 
 This is case insensitive, meaning that if you use `Base.toInt`
-it'll interpret upper and lower case as the same.
+it'll interpret upper and lower case input as the same.
 
-    > Base.toInt b32 "jeff"
+    > Base.toInt b36 "jeff"
     Ok 905163
 
-    > Base.toInt b32 "JEFF"
+    > Base.toInt b36 "JEFF"
     Ok 905163
 -}
-b32 : Base
-b32 = Base
-    { chars = "0123456789abcdefghijklmnopqrstuvwxyz"
-    , cases = CaseAgnostic
-    }
+b36 : Base
+b36 = make
+    "0123456789abcdefghijklmnopqrstuvwxyz"
+    CaseAgnostic
+
 
 {-| **base58.**
 
@@ -73,10 +110,10 @@ combinations - there is no `0`, `O`, `I` or `l`, leaving only
 
 -}
 b58 : Base
-b58 = Base
-    { chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-    , cases = CaseSensitive
-    }
+b58 = make
+    "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+    CaseSensitive
+
 
 {-| **base62.**
 
@@ -86,36 +123,51 @@ All numbers and all cases of letters.
     "BRg"
 -}
 b62 : Base
-b62 = Base 
-    { chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    , cases = CaseSensitive
-    }
+b62 = make 
+    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    CaseSensitive
+
+
+{-| **base64 in the most common form for text.**
+
+All numbers and all cases of letters, plus 62nd and 63rd characters,
+which are are `+` and `/` respectively.
+
+    > Base.fromInt b64 231166
+    "4b+"
+-}
+b64 : Base
+b64 = make
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+    CaseSensitive
+
 
 {-| **base64 in the RFC 4648 URL/filename-safe standard.**
 
 All numbers and all cases of letters, plus 62nd and 63rd characters,
 which are are `-` and `_` respectively.
 
-    > Base.fromInt b64 44000
-    "AlW"
+    > Base.fromInt b64 231166
+    "4b-"
 -}
-b64 : Base
-b64 = Base
-    { chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_"
-    , cases = CaseSensitive
-    }
+b64url : Base
+b64url = make
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+    CaseSensitive
+
+
 
 
 {-| Converts a positive Int into non-decimal number string.
 
-    > Base.fromInt b32 69420
+    > Base.fromInt b36 69420
     "1hkc"
 
 This does not support negative numbers - 
 any negative numbers will be converted
 into positive numbers.
 
-    > Base.fromInt b32 -69420
+    > Base.fromInt b36 -69420
     "1hkc"
 -}
 fromInt : Base -> Int -> String
@@ -198,6 +250,23 @@ type StringInputErr
 
 
 
+{-| Create a base for non-decimal conversion.
+
+The string input is both the characters you're
+mapping digits to (starting from digit 0) and the
+base of your resulting numbers (which will be the length of the string).
+
+    b16 : Base
+    b16 = make 
+        "0123456789abcdef"
+        CaseAgnostic
+
+-}
+make : String -> CaseSensitivity -> Base
+make chars cases =
+    Base { chars = chars, cases = cases }
+
+
 
 
 {-| The different bases this module supports, it's an opaque type.
@@ -210,6 +279,12 @@ type alias BaseStuff =
     , cases : CaseSensitivity
     }
 
+{-| Whether or not a base is case-sensitive. This affects whether cases
+are relevant when the `toInt` function is used.
+
+- CaseSensitive - Upper-case and lower-case letters are not interchangeable.
+- CaseAgnostic - Upper-case and lower-case letters are interchangeable.
+-}
 type CaseSensitivity
     = CaseSensitive
     | CaseAgnostic
@@ -296,17 +371,64 @@ loopingIntConversion baseXArray results remainder =
 
 
 
+{-| Converts an Int into a baseX string.
+
+This does not support negative numbers.
+-}
+internalToInt : Base -> String -> Result StringInputErr Int
+internalToInt base numStrInitial = 
+    let
+        digitStr = .chars <| unwrap base
+        caseSensitivity = .cases <| unwrap base
+        baseX = String.length digitStr
+
+        -- make it all lowercase if case insensitive
+        numStr = case caseSensitivity of
+            CaseAgnostic -> String.toLower numStrInitial
+            CaseSensitive -> numStrInitial
+    in
+        if String.isEmpty numStr then
+            Err EmptyString
+        else
+            let 
+                prelimRun =
+                    numStr
+                    |> String.toList
+                    |> List.indexedMap (digitToNum digitStr)
+                
+                failedChars = 
+                    prelimRun
+                    |> List.filter (\x -> Result.toMaybe x == Nothing)
+            
+            in
+                if List.isEmpty failedChars then
+                        prelimRun
+                    -- we can unwrap it now we know it's valid.
+                    |> List.map (Result.withDefault (0, 0))
+                    -- perform calcs to make the conversion work.
+                    |> reverseIndex
+                    |> List.map (\x -> (Tuple.second x * baseX ^ Tuple.first x))
+                    |> List.foldl (+) 0
+                    |> Ok
+                else
+                    failedChars
+                    |> List.filterMap
+                        (\ x -> case x of
+                                Err e -> Just e
+                                Ok _ -> Nothing
+                        )
+                    |> BadChars
+                    |> Err
+                        
+
 {-| Internal. Maps an indexed baseX digit to an indexed base10 Int.
 
 It returns an indexed Char if it fails for debugging,
 or an indexed Int if ir succeeds.
 -}
-digitToNum : String -> (Int, Char) -> Result (Int, Char) (Int, Int)
-digitToNum baseXStr indexedDigitChar =
+digitToNum : String -> Int -> Char -> Result (Int, Char) (Int, Int)
+digitToNum baseXStr index char =
     let
-        index = Tuple.first indexedDigitChar
-        char = Tuple.second indexedDigitChar
-
         attempt = 
             baseXStr
             |> String.toList
@@ -320,64 +442,10 @@ digitToNum baseXStr indexedDigitChar =
             Just i -> Ok (index, Tuple.first i) -- return the good int
 
 
-{-| Converts an Int into a baseX string.
-
-This does not support negative numbers.
+{-| Takes an indexed list and reverses the orders of the indexes.
+We need this because later calculations require reversed indexes.
 -}
-internalToInt : Base -> String -> Result StringInputErr Int
-internalToInt base numStrInitial = 
-    let
-        digitStr = .chars <| unwrap base
-        caseSensitivity = .cases <| unwrap base
+reverseIndex : List (Int, Int) -> List (Int, Int)
+reverseIndex list = 
+    List.map (\x -> (List.length list - Tuple.first x - 1, Tuple.second x ) ) list
 
-        numStr = 
-            case caseSensitivity of
-                CaseAgnostic -> String.toLower numStrInitial
-                CaseSensitive -> numStrInitial
-    in
-        if String.isEmpty numStr then
-            Err EmptyString
-        else
-            let
-                baseX = String.length digitStr
-            in
-                let 
-                    prelimRun =
-                        numStr
-                        |> String.toList
-                        |> Array.fromList
-                        |> Array.toIndexedList
-                        |> List.map (digitToNum digitStr)
-                    
-                    failedChars = 
-                        prelimRun
-                        |> List.filter (\x -> Result.toMaybe x == Nothing)
-                
-                in
-                    if List.isEmpty failedChars then
-                         prelimRun
-                        -- we can unwrap it now we know it's valid.
-                        |> List.map (Result.withDefault (0, 0))
-
-                        -- de-index, reverse the order and index again.
-                        -- (we need the powers to be in reverse order to the place of each digit)
-                        |> List.map Tuple.second
-                        |> List.reverse
-                        |> Array.fromList
-                        |> Array.toIndexedList
-
-                        -- perform calcs and add
-                        |> List.map (\x -> (Tuple.second x * baseX ^ Tuple.first x))
-                        |> List.foldl (+) 0
-                        |> Ok
-                    else
-                        failedChars
-                        |> List.filterMap
-                            (\ x ->
-                                case x of
-                                    Err e -> Just e
-                                    Ok _ -> Nothing
-                            )
-                        |> BadChars
-                        |> Err
-                           

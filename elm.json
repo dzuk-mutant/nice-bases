@@ -1,9 +1,9 @@
 {
     "type": "package",
     "name": "dzuk/nice-bases",
-    "summary": "Parastat's UI framework.",
+    "summary": "Convert to, from and between many non-decimal numbers.",
     "license": "BSD-3-Clause",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "exposed-modules": [
         "Base"
     ],

@@ -6,7 +6,11 @@ module Base exposing (b16, b32, b58, b62, b64, fromInt, toInt, StringInputErr(..
 @docs b16, b32, b58, b62, b64
 
 # Conversions
-@docs fromInt, toInt, convert, StringInputErr
+@docs fromInt, toInt, convert
+
+# Errors
+
+@docs StringInputErr
 -}
 
 
@@ -123,6 +127,9 @@ fromInt base num =
     > Base.toInt b64 "HAHA"
     Ok 4498506
 
+If your input string is invalid, it will return a
+`StringInputErr`. (See the docs for that type for more info.)
+
 This does not support negative values and will likely
 throw an error if you introduce them (apart from b64,
 because '-' is one of it's characters.).
@@ -137,7 +144,8 @@ toInt base numStr =
     > Base.convert b16 b58 "8f0ce9"
     Ok "q3r8"
 
-If your input string is invalid, it will return a StringInputErr.
+If your input string is invalid, it will return a `StringInputErr`.
+(See the docs for that type for more info.)
 -}
 convert : Base -> Base -> String -> Result StringInputErr String
 convert baseIn baseOut numStr =
@@ -346,31 +354,30 @@ internalToInt base numStrInitial =
                         |> List.filter (\x -> Result.toMaybe x == Nothing)
                 
                 in
-                    case List.isEmpty failedChars of
-                        False ->
-                            failedChars
-                            |> List.filterMap
-                                (\ x ->
-                                    case x of
-                                        Err e -> Just e
-                                        Ok _ -> Nothing
-                                )
-                            |> BadChars
-                            |> Err
+                    if List.isEmpty failedChars then
+                         prelimRun
+                        -- we can unwrap it now we know it's valid.
+                        |> List.map (Result.withDefault (0, 0))
 
-                        True ->
-                            prelimRun
-                            -- we can unwrap it now we know it's valid.
-                            |> List.map (Result.withDefault (0, 0))
+                        -- de-index, reverse the order and index again.
+                        -- (we need the powers to be in reverse order to the place of each digit)
+                        |> List.map Tuple.second
+                        |> List.reverse
+                        |> Array.fromList
+                        |> Array.toIndexedList
 
-                            -- de-index, reverse the order and index again.
-                            -- (we need the powers to be in reverse order to the place of each digit)
-                            |> List.map Tuple.second
-                            |> List.reverse
-                            |> Array.fromList
-                            |> Array.toIndexedList
-
-                            -- perform calcs and add
-                            |> List.map (\x -> (Tuple.second x * baseX ^ Tuple.first x))
-                            |> List.foldl (+) 0
-                            |> Ok
+                        -- perform calcs and add
+                        |> List.map (\x -> (Tuple.second x * baseX ^ Tuple.first x))
+                        |> List.foldl (+) 0
+                        |> Ok
+                    else
+                        failedChars
+                        |> List.filterMap
+                            (\ x ->
+                                case x of
+                                    Err e -> Just e
+                                    Ok _ -> Nothing
+                            )
+                        |> BadChars
+                        |> Err
+                           

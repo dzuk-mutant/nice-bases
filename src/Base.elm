@@ -1,4 +1,4 @@
-module Base exposing (b16, b32, b32rfc, b36, b58, b62, b64, b64url, make, CaseSensitivity(..), fromInt, toInt, convert, Err(..))
+module Base exposing (Base, b16, b32, b32rfc, b36, b58, b62, b64, b64url, make, CaseSensitivity(..), fromInt, toInt, convert, Err(..))
 
 {-| Convert to, from and between positive numbers of different bases.
 

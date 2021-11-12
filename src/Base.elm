@@ -269,7 +269,10 @@ make chars cases =
 
 
 
-{-| The different bases this module supports, it's an opaque type.
+{-| A type that contains the instructions to convert Ints
+into a string representing a non-decimal number and vice versa.
+
+It's an opaque type.
 -}
 type Base =
     Base BaseStuff

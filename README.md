@@ -1,10 +1,13 @@
+# Important! read this first!
+
+***(This package does not have an OSI-approved license. It just has one indicated in the elm.json because otherwise Elm will not let this compile.***
+
+***This package is actually licensed under [NPL (Nonviolent Public License) v7](LICENSE). [You can read more about the NPL license family here](https://thufie.lain.haus/NPL.html).***
+
+
 # nice-bases
 
-***(This package does not have an OSI-approved license. It just has one indicated in the elm.json because otherwise Elm will not let this compile. Look at the end of the readme for the actual license.)***
-
 Convert to and from different bases of positive numbers.
-
-
 
 ## Features
 
@@ -76,11 +79,3 @@ Use the same functions for any base type the package supports. Convert between b
 ### Better errors
 
 I also noticed that similar packages returned errors in English strings, which makes localising errors very difficult, so this returns types instead.
-
-
-----
-
-
-## License
-
-This package is licensed under [NPL v5](LICENSE).

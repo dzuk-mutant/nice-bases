@@ -3,7 +3,7 @@ module Base exposing (Base, b16, b32, b32rfc, b36, b58, b62, b64, b64url, make, 
 {-| Convert to, from and between positive numbers of different bases.
 
 # Bases
-@docs b16, b32, b32rfc, b36, b58, b62, b64, b64url
+@docs Base, b16, b32, b32rfc, b36, b58, b62, b64, b64url
 
 # Conversions
 @docs fromInt, toInt, convert

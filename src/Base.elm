@@ -1,4 +1,4 @@
-module Base exposing (b16, b32, b32rfc, b36, b58, b62, b64, b64url, make, CaseSensitivity(..), fromInt, toInt, convert, StringInputErr(..))
+module Base exposing (b16, b32, b32rfc, b36, b58, b62, b64, b64url, make, CaseSensitivity(..), fromInt, toInt, convert, Err(..))
 
 {-| Convert to, from and between positive numbers of different bases.
 
@@ -9,7 +9,7 @@ module Base exposing (b16, b32, b32rfc, b36, b58, b62, b64, b64url, make, CaseSe
 @docs fromInt, toInt, convert
 
 # Errors
-@docs StringInputErr
+@docs Err
 
 # Create your own
 @docs make, CaseSensitivity
@@ -180,13 +180,13 @@ fromInt base num =
     Ok 4498506
 
 If your input string is invalid, it will return a
-`StringInputErr`. (See the docs for that type for more info.)
+`Err`. (See the docs for that type for more info.)
 
 This does not support negative values and will likely
 throw an error if you introduce them (apart from b64,
 because '-' is one of it's characters.).
 -}
-toInt : Base -> String -> Result StringInputErr Int
+toInt : Base -> String -> Result Err Int
 toInt base numStr =
     internalToInt base numStr
 
@@ -196,10 +196,10 @@ toInt base numStr =
     > Base.convert b16 b58 "8f0ce9"
     Ok "q3r8"
 
-If your input string is invalid, it will return a `StringInputErr`.
+If your input string is invalid, it will return a `Err`.
 (See the docs for that type for more info.)
 -}
-convert : Base -> Base -> String -> Result StringInputErr String
+convert : Base -> Base -> String -> Result Err String
 convert baseIn baseOut numStr =
     internalToInt baseIn numStr
     |> Result.map (internalFromInt baseOut)
@@ -220,7 +220,7 @@ string that don't match the spec of the base you used.
 It provides a list of each char that failed along with their index in the input string.
 
 -}
-type StringInputErr
+type Err
     = EmptyString
     | BadChars (List (Int, Char))
 
@@ -375,7 +375,7 @@ loopingIntConversion baseXArray results remainder =
 
 This does not support negative numbers.
 -}
-internalToInt : Base -> String -> Result StringInputErr Int
+internalToInt : Base -> String -> Result Err Int
 internalToInt base numStrInitial = 
     let
         digitStr = .chars <| unwrap base

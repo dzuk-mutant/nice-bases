@@ -1,8 +1,10 @@
 # Important! read this first!
 
-***(This package does not have an OSI-approved license. It just has one indicated in the elm.json because otherwise Elm will not let this compile.***
+**This package does not have an OSI-approved license. It just has one indicated in the elm.json because otherwise Elm will not let this compile.**
 
-***This package is actually licensed under [NPL (Nonviolent Public License) v7](LICENSE). [You can read more about the NPL license family here](https://thufie.lain.haus/NPL.html).***
+**This package is actually licensed under [NPL (Nonviolent Public License) v7](LICENSE).**
+
+**[You can read more about the NPL license family here](https://thufie.lain.haus/NPL.html).**
 
 
 # nice-bases

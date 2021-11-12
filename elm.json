@@ -1,6 +1,6 @@
 {
     "type": "package",
-    "name": "dzuk/nice-bases",
+    "name": "dzuk-mutant/nice-bases",
     "summary": "Convert to, from and between many types of non-decimal numbers.",
     "license": "BSD-3-Clause",
     "version": "1.0.0",
